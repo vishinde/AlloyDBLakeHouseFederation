@@ -19,6 +19,7 @@ tools:
         type: string
         description: "The unique identifier for the tenant (e.g., 'sk_prod_88')."
     statement: |
+      /* {"app": "threat-intel-agent", "component": "agentmodule", "action": "alloydbbqfederated"} */
       SELECT 
           l.tenant_id, 
           l.source_ip, 
@@ -40,6 +41,7 @@ tools:
         type: string
         description: "The unique identifier for the tenant (e.g., 'sk_prod_88')."
     statement: |
+      /* {"app": "threat-intel-agent", "component": "agentmodule", "action": "alloydb_fallback"} */
       SELECT 
           l.tenant_id, 
           l.source_ip, 
