@@ -1,0 +1,59 @@
+# 1. Define your database connection
+sources:
+    secops-db-source:
+        kind: "postgres"
+        host: "ip_addr"
+        port: "6432"
+        database: "secopsdb"
+        user: "postgres"
+        password: "xxxx"
+
+# 2. Define your custom MCP database tool
+tools:
+  get_tenant_security_events:
+    kind: postgres-sql
+    source: secops-db-source
+    description: Retrieves security logs, active malware families, and risk scores for a specified tenant ID.
+    parameters:
+      - name: tenant
+        type: string
+        description: "The unique identifier for the tenant (e.g., 'sk_prod_88')."
+    statement: |
+      SELECT 
+          l.tenant_id, 
+          l.source_ip, 
+          h.malware_family, 
+          h.risk_score
+      FROM 
+          get_tenant_events($1) as l  -- $1 maps to the first parameter ('tenant')
+      INNER JOIN 
+          v_agent_threat_intelligence AS h
+      ON CAST(l.source_ip AS VARCHAR) = CONCAT(h.indicator_val, '/32');
+
+
+  get_tenant_security_events_failback:
+    kind: postgres-sql
+    source: secops-db-source
+    description: Retrieves security logs, active malware families, and risk scores for a specified tenant ID.
+    parameters:
+      - name: tenant
+        type: string
+        description: "The unique identifier for the tenant (e.g., 'sk_prod_88')."
+    statement: |
+      SELECT 
+          l.tenant_id, 
+          l.source_ip, 
+          h.malware_family, 
+          h.risk_score
+      FROM 
+          get_tenant_events($1) as l  -- $1 maps to the first parameter ('tenant')
+      INNER JOIN 
+          public.global_indicators_local AS h
+      ON CAST(l.source_ip AS VARCHAR) = CONCAT(h.indicator_val, '/32');
+
+
+# Group it under 'default' which the server is already initializing
+toolsets:
+  tenant_security_events_toolset:
+    - get_tenant_security_events
+    - get_tenant_security_events_failback
