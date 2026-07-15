@@ -9,7 +9,7 @@ This repository provides a production-ready, resilient blueprint for **Lakehouse
 The platform uses a split-plane execution design:
 
 * **The Primary Path:** The Security Analyst Agent uses the MCP Toolbox to request federated threat intelligence from BigQuery via AlloyDB read pools.
-* **The Fallback Path:** If a query times out or breaks, a local Python circuit-breaker pattern trips, writes execution failure logs to AlloyDB's primary database, and shifts the agent to fetch stale, local caching replicas in AlloyDB instead.
+* **The Fallback Path:** If a query times out or breaks, a local Python circuit breaker pattern trips, shifts the agent to fetch local cached data from the read only pool in AlloyDB and writes execution failure logs to AlloyDB's primary database for troubleshooting.
 
 ---
 
