@@ -40,6 +40,12 @@ WHERE
 ORDER BY c.columnar_scan_time DESC
 LIMIT 10;
 
+--Monitor columnar memory and invalidation ratios
+SELECT relation_name, status, size, invalid_block_count, total_block_count 
+FROM g_columnar_relations 
+WHERE relation_name = 'global_indicators_local';
+
+
 --EXPLAIN ANALYZE for your query confirm: 
 --Custom Scan (Columnar Scan): Indicates the optimizer read directly from the columnar store. Check the execution breakdown attributes: look for the Rows Removed by Columnar Filter line to confirm the engine is discarding unwanted matching values quickly inside memory.
 --Vectorized Hash Join / Vectorized Aggregation: This proves the engine is executing math across multi-row chunks simultaneously using hardware SIMD (Single Instruction, Multiple Data) processor extensions rather than stepping loop-by-loop through standard individual rows.
