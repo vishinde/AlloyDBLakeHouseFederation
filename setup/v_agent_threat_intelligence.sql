@@ -1,5 +1,5 @@
 --View to fetch historical data imported in AlloyDB with latest day data from BigQuery
---pg_cron job inserts data nightly from BigQuery into global_indicators_local table in AlloyDB
+--AlloyDB sync inserts data nightly from BigQuery into global_indicators_local table in AlloyDB
 
 -- 1. Create the helper wrapper to create immutable function
 CREATE OR REPLACE FUNCTION public.immutable_today() 
