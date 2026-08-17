@@ -27,7 +27,7 @@ Step 2: AlloyDB Instance & Schema Setup
 Step 3: Insert Historical Seed Data
        │
        ▼
-Step 4: Configure pg_cron Ingestion Automation
+Step 4: Configure Ingestion Automation using AlloyDB Sync
        │
        ▼
 Step 5: Define Lakehouse Federation Views
@@ -85,15 +85,24 @@ Populate local lookup and seed values inside your AlloyDB databases. These local
 
 ## Step 4: Configure `pg_cron` Ingestion
 
-To keep the local replica cache fresh without manually executing scripts, we automate the pipeline using the PostgreSQL `pg_cron` extension inside AlloyDB.
+To keep the local replica cache fresh without manually executing scripts, we automate the pipeline using the AlloyDB Sync feature.
 
-1. **Enable pg_cron:** Ensure `pg_cron` is added to your AlloyDB shared libraries under your instance's database flags.
-2. **Register the Cron Job:** Run the `pgcron_ingest` script to schedule regular local cache updates:
+1. **Enable alloydb_sync:** Ensure `alloydb_sync` extension is enabled in your AlloyDB instance. 
+2. **Leverage single function call:** Run the `alloydb_sync.create_bq_sync_table` script to schedule regular AlloyDB updates from BigQuery:
 ```sql
--- Example scheduling script
-SELECT cron.schedule('sync-local-threat-cache', '*/30 * * * *', $$
-    -- Insert sync query logic here to refresh AlloyDB replica tables
-$$);
+-- 1. Enable BigQuery Sync Extension
+CREATE EXTENSION IF NOT EXISTS alloydb_sync;
+
+-- 2. Create Managed Continuous Mirror (Replaces pg_cron schedule & INSERT loop)
+SELECT alloydb_sync.create_bq_sync_table(
+    'bq-project-402513.threat_intelligence.global_indicators', -- Source BQ table
+    'public.global_indicators_local',                          -- Destination AlloyDB table
+    '1 day',                                                   -- Refresh interval (e.g. '1 hour', '1 day')
+    'replace',                                                 -- On exists: 'replace' | 'skip' | 'error'
+    ARRAY['indicator_val']                                     -- Primary key columns
+);
+-- 3. Verify sync status
+SELECT * FROM alloydb_sync.job_status;
 
 ```
 
