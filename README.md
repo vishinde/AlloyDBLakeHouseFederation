@@ -83,7 +83,7 @@ Populate local lookup and seed values inside your AlloyDB databases. These local
 
 ---
 
-## Step 4: Configure `pg_cron` Ingestion
+## Step 4: Configure AlloyDB Sync Ingestion
 
 To keep the local replica cache fresh without manually executing scripts, we automate the pipeline using the AlloyDB Sync feature.
 
