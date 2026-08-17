@@ -183,7 +183,7 @@ python3 agent.py
 If the primary BigQuery connection is severed or a query times out, the agent will gracefully execute the following circuit-breaker sequence in real-time:
 
 * **Log Triage Event:** The agent automatically runs `triage_and_log_federation_timeout` and writes a detailed log (including the compiled `INFORMATION_SCHEMA` debug query) to `public.federation_circuit_breaker_logs` on your primary AlloyDB instance.
-* **Initiate Cache Fallback:** The agent calls `get_tenant_security_events_fallback` to read the cached data replicated by `pg_cron`.
+* **Initiate Cache Fallback:** The agent calls `get_tenant_security_events_fallback` to read the cached data replicated by AlloyDB Sync.
 * **Deliver Report:** The agent presents its findings to your **Agentic SOC Console** with a warning stating that live threat intelligence was unavailable and fallback records were used instead.
 
 * ### Key Metric Thresholds & Alerting Guide
