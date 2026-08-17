@@ -10,5 +10,8 @@ SELECT alloydb_sync.create_bq_sync_table(
     ARRAY['indicator_val']                                     -- Primary key columns
 );
 
--- 3. Verify sync status
+-- 3. Induct table into Columnar Engine for vectorized acceleration
+SELECT google_columnar_engine_add('public.global_indicators_local');
+
+-- 4. Verify sync status
 SELECT * FROM alloydb_sync.job_status;
